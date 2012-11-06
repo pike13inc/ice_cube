@@ -30,7 +30,7 @@ module IceCube
 
     def self.from_ical ical
       params = {:validations => {}}
-
+      week_start = :sunday
       ical.split(';').each do |rule|
         (name, value) = rule.split('=')
         case name
@@ -79,13 +79,14 @@ module IceCube
           params[:validations][:month_of_year] = value.split(',').collect{ |v| v.to_i }
         when "BYYEARDAY"
           params[:validations][:day_of_year] = value.split(',').collect{ |v| v.to_i }
-
+        when "WKST"
+          week_start = TimeUtil.ical_day_to_symbol value
         else
           raise "Invalid or unsupported rrule command : #{name}"
         end
       end
 
-      rule = IceCube::Rule.send(params[:freq], params[:interval] || 1)
+      rule = IceCube::Rule.send(params[:freq], params[:interval] || 1, week_start)
       rule.count(params[:count]) if params[:count]
       rule.until(params[:until]) if params[:until]
       params[:validations].each do |key, value|
