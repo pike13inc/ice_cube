@@ -85,8 +85,11 @@ module IceCube
           raise "Invalid or unsupported rrule command : #{name}"
         end
       end
-
-      rule = IceCube::Rule.send(params[:freq], params[:interval] || 1, week_start)
+      if params[:freq] == 'weekly'
+        rule = IceCube::Rule.send(params[:freq], params[:interval] || 1, week_start)
+      else
+        rule = IceCube::Rule.send(params[:freq], params[:interval] || 1)
+      end
       rule.count(params[:count]) if params[:count]
       rule.until(params[:until]) if params[:until]
       params[:validations].each do |key, value|
