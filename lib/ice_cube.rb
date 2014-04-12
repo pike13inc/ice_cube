@@ -1,13 +1,6 @@
 require 'date'
 require 'ice_cube/deprecated'
 
-# Use psych if we can
-begin
-  require 'psych'
-rescue LoadError
-  require 'yaml'
-end
-
 module IceCube
 
   autoload :VERSION, 'ice_cube/version'
@@ -17,10 +10,14 @@ module IceCube
 
   autoload :Rule, 'ice_cube/rule'
   autoload :Schedule, 'ice_cube/schedule'
+  autoload :Occurrence, 'ice_cube/occurrence'
 
   autoload :IcalBuilder, 'ice_cube/builders/ical_builder'
   autoload :HashBuilder, 'ice_cube/builders/hash_builder'
   autoload :StringBuilder, 'ice_cube/builders/string_builder'
+
+  autoload :HashParser, 'ice_cube/parsers/hash_parser'
+  autoload :YamlParser, 'ice_cube/parsers/yaml_parser'
 
   autoload :CountExceeded, 'ice_cube/errors/count_exceeded'
   autoload :UntilExceeded, 'ice_cube/errors/until_exceeded'
@@ -70,10 +67,6 @@ module IceCube
   ONE_DAY =    ONE_HOUR   * 24
   ONE_WEEK =   ONE_DAY    * 7
 
-  def self.use_psych?
-    @use_psych ||= defined?(Psych) && defined?(Psych::VERSION)
-  end
-
   # Defines the format used by IceCube when printing out Schedule#to_s.
   # Defaults to '%B %e, %Y'
   def self.to_s_time_format
@@ -83,5 +76,15 @@ module IceCube
   # Sets the format used by IceCube when printing out Schedule#to_s.
   def self.to_s_time_format=(format)
     @to_s_time_format = format
+  end
+
+  # Retain backwards compatibility for schedules exported from older versions
+  # This represents the version number, 11 = 0.11, 1.0 will be 100
+  def self.compatibility
+    @compatibility ||= 11
+  end
+
+  def self.compatibility=(version)
+    @compatibility = version
   end
 end
