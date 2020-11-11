@@ -63,6 +63,10 @@ module IceCube
       start_time
     end
 
+    def skipped_for_excluded_time
+      @uses -= 1 if @uses > 0
+    end
+
     def full_required?
       !occurrence_count.nil?
     end

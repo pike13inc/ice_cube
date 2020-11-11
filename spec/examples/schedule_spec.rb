@@ -371,6 +371,14 @@ describe IceCube::Schedule do
       expect(schedule.all_occurrences.size).to eq(5)
     end
 
+    it 'should consider count limits separate from exclusion rules' do
+      start_time = Time.now
+      schedule = IceCube::Schedule.new start_time
+      schedule.rrule IceCube::Rule.daily.count(5)
+      schedule.extime start_time + IceCube::ONE_DAY
+      expect(schedule.all_occurrences.size).to eq(5)
+    end
+
   end
 
   describe :next_occurrences do

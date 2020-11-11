@@ -472,6 +472,9 @@ module IceCube
     def exception_time?(time)
       @all_exception_rules.any? do |rule|
         rule.on?(time, start_time)
+        rule.on?(time, start_time).tap do |time_excluded|
+          wind_back_excluded_time if time_excluded
+        end
       end
     end
 
@@ -502,6 +505,12 @@ module IceCube
         [implicit_start_occurrence_rule].concat @all_recurrence_rules
       else
         @all_recurrence_rules
+      end
+    end
+
+    def wind_back_excluded_time
+      recurrence_rules.each do |rule|
+        rule.skipped_for_excluded_time
       end
     end
 
